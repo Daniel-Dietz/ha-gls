@@ -5,6 +5,7 @@ from custom_components.gls.device_trigger import TRIGGER_EVENTS, async_get_trigg
 
 
 async def test_get_triggers_returns_all_four(hass):
+    """Expose all four parcel lifecycle triggers scoped to the requested device."""
     triggers = await async_get_triggers(hass, "device123")
     types = {t["type"] for t in triggers}
     assert types == {
@@ -19,4 +20,5 @@ async def test_get_triggers_returns_all_four(hass):
 
 
 def test_trigger_events_map_to_domain_prefix():
+    """Require the registered trigger to use the integration's event namespace."""
     assert TRIGGER_EVENTS["parcel_registered"] == f"{DOMAIN}_parcel_registered"

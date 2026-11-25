@@ -7,12 +7,14 @@ from custom_components.gls.calendar import GlsDeliveriesCalendar
 
 
 def _entry(entry_id: str = "e1") -> MagicMock:
+    """Create a minimal config entry with a deterministic identifier."""
     entry = MagicMock()
     entry.entry_id = entry_id
     return entry
 
 
 def _coordinator(data: list[dict]) -> MagicMock:
+    """Provide coordinator data without performing carrier I/O."""
     coordinator = MagicMock()
     coordinator.data = data
     return coordinator
@@ -21,6 +23,7 @@ def _coordinator(data: list[dict]) -> MagicMock:
 def _parcel(
     barcode, planned_from=None, planned_to=None, pickup=False, pickup_point=None
 ):
+    """Build a normalized delivery record with optional timing and pickup details."""
     return {
         "barcode": barcode,
         "sender": "Example Sender",
@@ -34,10 +37,12 @@ def _parcel(
 
 
 def _cal(data):
+    """Construct a delivery calendar from a synthetic coordinator snapshot."""
     return GlsDeliveriesCalendar(_coordinator(data), _entry())
 
 
 def test_event_returns_earliest_upcoming():
+    """Choose the earliest upcoming delivery even when input order is reversed."""
     cal = _cal(
         [
             _parcel("LATE", planned_from="2099-01-02T10:00:00Z"),
@@ -50,34 +55,40 @@ def test_event_returns_earliest_upcoming():
 
 
 def test_contents_is_the_event_title():
+    """Prefer the user's contents annotation as the calendar summary."""
     parcel = _parcel("A", planned_from="2099-01-01T10:00:00Z")
     parcel["contents"] = "Garden hose"
     assert _cal([parcel])._events()[0].summary == "Garden hose"
 
 
 def test_title_falls_back_to_sender_without_contents():
+    """Use the sender as calendar title when no contents annotation exists."""
     parcel = _parcel("A", planned_from="2099-01-01T10:00:00Z")
     parcel["contents"] = None
     assert _cal([parcel])._events()[0].summary == "Example Sender"
 
 
 def test_title_keeps_the_old_fallback_without_contents_or_sender():
+    """Use the stable parcel barcode when neither contents nor sender is known."""
     parcel = _parcel("A", planned_from="2099-01-01T10:00:00Z")
     parcel["sender"] = None
     assert _cal([parcel])._events()[0].summary == "Parcel A"
 
 
 def test_event_none_when_no_planned():
+    """Avoid inventing a calendar event for a parcel with no delivery estimate."""
     assert _cal([_parcel("A")]).event is None
 
 
 def test_moment_gets_one_hour_duration():
+    """Apply the default one-hour duration when only a start instant is available."""
     cal = _cal([_parcel("A", planned_from="2099-01-01T10:00:00Z")])
     events = cal._events()
     assert events[0].end == datetime(2099, 1, 1, 11, 0, tzinfo=UTC)
 
 
 def test_interval_uses_window():
+    """Preserve the carrier's explicit delivery window end rather than the default."""
     cal = _cal(
         [
             _parcel(
@@ -91,6 +102,7 @@ def test_interval_uses_window():
 
 
 def test_pickup_sets_location():
+    """Populate the calendar location for a delivery to a GLS pickup point."""
     cal = _cal(
         [
             _parcel(
@@ -105,15 +117,18 @@ def test_pickup_sets_location():
 
 
 def test_naive_planned_from_treated_as_utc():
+    """Interpret a timezone-naive canonical delivery timestamp as UTC."""
     cal = _cal([_parcel("A", planned_from="2099-01-01T10:00:00")])  # no tz
     assert cal._events()[0].start == datetime(2099, 1, 1, 10, 0, tzinfo=UTC)
 
 
 def test_unparseable_planned_from_skipped():
+    """Skip invalid timestamps instead of emitting a broken calendar event."""
     assert _cal([_parcel("A", planned_from="not-a-date")]).event is None
 
 
 async def test_get_events_filters_by_range():
+    """Return only timed deliveries overlapping the requested calendar range."""
     cal = _cal(
         [
             _parcel("PAST", planned_from="2000-01-01T10:00:00Z"),
@@ -127,10 +142,12 @@ async def test_get_events_filters_by_range():
 
 
 def _planned(barcode, planned_from, planned_to):
+    """Construct a parcel with explicit start and end values for window tests."""
     return _parcel(barcode, planned_from, planned_to)
 
 
 def test_whole_day_window_is_an_all_day_event():
+    """Convert a full carrier-local day into an exclusive-end all-day event."""
     cal = _cal(
         [_planned("A", "2099-01-01T00:00:00+01:00", "2099-01-01T23:59:59+01:00")]
     )
@@ -140,12 +157,14 @@ def test_whole_day_window_is_an_all_day_event():
 
 
 def test_window_over_whole_days_is_one_all_day_event():
+    """Represent a multi-day delivery window with one exclusive-end all-day event."""
     cal = _cal([_planned("A", "2099-01-01T00:00:00", "2099-01-03T23:59:59")])
     event = cal._events()[0]
     assert (event.start, event.end) == (date(2099, 1, 1), date(2099, 1, 4))
 
 
 async def test_whole_day_window_sent_in_utc_is_all_day_in_local_time(hass):
+    """Recognize a whole local day when the carrier supplies equivalent UTC times."""
     await hass.config.async_set_time_zone("Europe/Amsterdam")
     cal = _cal([_planned("A", "2099-01-01T23:00:00Z", "2099-01-02T22:59:59Z")])
     event = cal._events()[0]
@@ -153,6 +172,7 @@ async def test_whole_day_window_sent_in_utc_is_all_day_in_local_time(hass):
 
 
 def test_a_moment_stretched_to_the_end_of_its_day_stays_timed():
+    """Keep a partial-day delivery window timed even if it ends at midnight."""
     cal = _cal(
         [_planned("A", "2099-01-01T14:00:00+01:00", "2099-01-01T23:59:59+01:00")]
     )
@@ -160,6 +180,7 @@ def test_a_moment_stretched_to_the_end_of_its_day_stays_timed():
 
 
 async def test_all_day_events_are_upcoming_and_filtered_by_range():
+    """Exclude past all-day deliveries from the next event and query range."""
     cal = _cal(
         [
             _planned("PAST", "2000-01-01T00:00:00", "2000-01-01T23:59:59"),

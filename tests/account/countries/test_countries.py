@@ -20,6 +20,7 @@ from custom_components.gls.const import CONF_COUNTRY, DOMAIN
 
 
 def test_every_registry_row_is_consistent():
+    """Verify registry keys and device names do not depend on account identifiers."""
     for code, country in ACCOUNT_SOURCES.items():
         assert country.code == code
         # Entity IDs derive from the device name: never an identifier.
@@ -27,6 +28,7 @@ def test_every_registry_row_is_consistent():
 
 
 def test_account_country_follows_the_entry_option():
+    """Resolve each supported account adapter from the config entry's country."""
     for code in ACCOUNT_SOURCES:
         entry = MockConfigEntry(
             domain=DOMAIN, data={"source": "account"}, options={CONF_COUNTRY: code}
@@ -42,6 +44,7 @@ def test_account_country_has_no_silent_default():
 
 
 def test_login_normalizers_keep_the_typed_form():
+    """Preserve the login format required by Danish and Polish authentication."""
     assert ACCOUNT_SOURCES["DK"].normalize_login("  user@example.com ") == (
         "user@example.com"
     )
@@ -50,6 +53,7 @@ def test_login_normalizers_keep_the_typed_form():
 
 
 def test_country_errors_are_the_shared_account_errors():
+    """Ensure account-specific failures participate in shared exception handling."""
     assert issubclass(GlsDkApiError, GlsAccountApiError)
     assert issubclass(GlsDkAuthError, GlsAccountAuthError)
     assert issubclass(GlsDkAuthError, GlsDkApiError)
@@ -65,6 +69,7 @@ def test_every_account_country_has_its_config_flow_step():
 
 
 def test_persisted_state_keeps_only_identity_token_and_sign_in_field():
+    """Persist only the identity, refresh token and nonempty country-specific login."""
     state = {
         "uid": "u",
         "refresh_token": "r",

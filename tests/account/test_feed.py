@@ -11,6 +11,7 @@ from custom_components.gls.account.feed import complete_items
 
 
 def test_complete_feed_returns_its_items():
+    """Return complete nonempty and empty feeds when item counts agree."""
     items = [{"a": 1}, {"b": 2}]
     assert complete_items({"items": items, "total": 2}, "total") == items
     assert complete_items({"items": [], "total": 0}, "total") == []
@@ -31,11 +32,13 @@ def test_complete_feed_returns_its_items():
     ],
 )
 def test_invalid_or_incomplete_feed_is_refused(feed):
+    """Reject malformed or incomplete feeds before replacing a published snapshot."""
     with pytest.raises(GlsAccountFeedError):
         complete_items(feed, "total")
 
 
 def test_a_ceiling_count_accepts_a_shortfall_but_not_a_surplus(caplog):
+    """Allow an explicitly documented count ceiling but never excess returned items."""
     with caplog.at_level(logging.DEBUG, logger="custom_components.gls.account.feed"):
         assert (
             complete_items({"items": [], "total": 1}, "total", count_is_ceiling=True)
@@ -49,6 +52,7 @@ def test_a_ceiling_count_accepts_a_shortfall_but_not_a_surplus(caplog):
 
 
 def test_a_rejected_list_logs_only_the_counts(caplog):
+    """Log feed counts rather than parcel payloads when completeness validation fails."""
     feed = {"items": [{"parcelNumber": "secret"}], "total": 3}
     with (
         caplog.at_level(logging.DEBUG, logger="custom_components.gls.account.feed"),
@@ -60,6 +64,7 @@ def test_a_rejected_list_logs_only_the_counts(caplog):
 
 
 def test_a_rejected_list_without_items_logs_the_types(caplog):
+    """Record field types when the account feed omits its required item list."""
     with (
         caplog.at_level(logging.DEBUG, logger="custom_components.gls.account.feed"),
         pytest.raises(GlsAccountFeedError),
