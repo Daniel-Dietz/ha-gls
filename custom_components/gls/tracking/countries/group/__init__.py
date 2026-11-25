@@ -45,15 +45,13 @@ from ..it import async_get_history_it
 _LOGGER = logging.getLogger(__name__)
 
 _NEW_ISSUE_URL = (
-    "https://github.com/ha-parcel-integrations/ha-gls/issues/new"
-    "?template=unrecognised_status.yml"
+    "https://github.com/Daniel-Dietz/ha-gls/issues/new?template=unrecognised_status.yml"
 )
 
 # Reports about which *country* a leaf answered for go to their own template,
 # not the status one — the question is coverage, not an unmapped code.
 _COVERAGE_ISSUE_URL = (
-    "https://github.com/ha-parcel-integrations/ha-gls/issues/new"
-    "?template=country_coverage.yml"
+    "https://github.com/Daniel-Dietz/ha-gls/issues/new?template=country_coverage.yml"
 )
 
 

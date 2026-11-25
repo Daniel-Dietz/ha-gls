@@ -1,0 +1,6 @@
+# Home Assistant 2026.10.4 / Python 3.14; latest compatible published
+# test harness at the time of the audit (2026-11-25).
+pytest-homeassistant-custom-component==0.13.375
+pytest==9.0.3
+pytest-asyncio==1.4.0
+pytest-cov==7.1.0

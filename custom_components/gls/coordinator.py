@@ -197,6 +197,7 @@ class GlsBaseCoordinator(DataUpdateCoordinator[list[dict]]):
         return _apply_delivered_filter(parcels, self.config_entry)
 
     async def _async_update_data(self) -> list[dict]:
+        """Poll the source and restore a retry interval on failure."""
         try:
             return await self._async_poll()
         except Exception:
@@ -212,6 +213,7 @@ class GlsBaseCoordinator(DataUpdateCoordinator[list[dict]]):
             raise
 
     async def _async_poll(self) -> list[dict]:
+        """Fetch and publish the source-specific normalized parcel snapshot."""
         raise NotImplementedError
 
     def _finish_update(

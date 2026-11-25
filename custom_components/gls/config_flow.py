@@ -49,7 +49,7 @@ _LOGGER = logging.getLogger(__name__)
 
 # First-run form: pick the delivery country and postcode. The postcode
 # becomes the hub default, so adding a parcel later needs only its tracking
-# number. The setup form links to the organisation discussion for requesting
+# number. The setup form links to the issue tracker for requesting
 # a country not yet in COUNTRIES (see REQUEST_COUNTRY_URL).
 _COUNTRY_SELECTOR = selector.SelectSelector(
     selector.SelectSelectorConfig(

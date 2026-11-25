@@ -39,6 +39,7 @@ def _moment(value: Any, zone: tzinfo) -> tuple[datetime, bool, str] | None:
 
 
 def _end_of_day(moment: datetime, zone: tzinfo) -> datetime:
+    """Return the end of the carrier-local civil day for the given moment."""
     local = moment.astimezone(zone)
     return datetime.combine(local.date(), time(23, 59, 59), tzinfo=zone)
 
@@ -67,6 +68,7 @@ def planned_window(
         return None, None
 
     def closing(moment: tuple[datetime, bool, str]) -> datetime:
+        """Resolve a date-only end to the end of its carrier-local day."""
         return _end_of_day(moment[0], zone) if moment[1] else moment[0]
 
     if last is not None and closing(last) < first[0]:

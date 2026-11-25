@@ -2,8 +2,6 @@ name: 🌍 Country lookup report
 description: The integration logged a warning asking you to report what GLS answered for your country.
 title: "[coverage] "
 labels: ["country-coverage"]
-assignees:
-  - peter-mdf
 body:
   - type: markdown
     attributes:

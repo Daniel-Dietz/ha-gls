@@ -1,13 +1,13 @@
 # GLS Parcel Tracker
 
-[![Release](https://img.shields.io/github/v/release/ha-parcel-integrations/ha-gls.svg)](https://github.com/ha-parcel-integrations/ha-gls/releases)
-[![Downloads](https://img.shields.io/github/downloads/ha-parcel-integrations/ha-gls/total.svg)](https://github.com/ha-parcel-integrations/ha-gls/releases)
-[![Marketplace](https://img.shields.io/badge/Marketplace-Default-41BDF5.svg)](https://hacs.xyz)
+[![Release](https://img.shields.io/github/v/release/Daniel-Dietz/ha-gls.svg)](https://github.com/Daniel-Dietz/ha-gls/releases)
+[![Downloads](https://img.shields.io/github/downloads/Daniel-Dietz/ha-gls/total.svg)](https://github.com/Daniel-Dietz/ha-gls/releases)
+[![HACS](https://img.shields.io/badge/HACS-Custom-41BDF5.svg)](https://hacs.xyz)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-> 📦 Part of [**ha-parcel-integrations**](https://ha-parcel-integrations.github.io/), a family of package-tracking integrations for Home Assistant that all publish the same parcel format, statuses and events, so they plug into cross-carrier automations and the optional [Parcel Aggregator](https://github.com/ha-parcel-integrations/ha-parcel-aggregator). Browse the other carriers on the website.
+> 📦 Derived from [**ha-parcel-integrations**](https://ha-parcel-integrations.github.io/), a family of package-tracking integrations for Home Assistant that all publish the same parcel format, statuses and events, so they plug into cross-carrier automations and the optional [Parcel Aggregator](https://github.com/ha-parcel-integrations/ha-parcel-aggregator). Browse the other carriers on the website.
 >
-> 💬 Questions or feedback? Join the discussion on the [Home Assistant community](https://community.home-assistant.io/t/packages-postnl-dhl-nl-dpd-and-gls-parcel-integration/112433/).
+> 💬 For fork-specific bugs and requests, use [our issue tracker](https://github.com/Daniel-Dietz/ha-gls/issues). Upstream community discussion: [Home Assistant community](https://community.home-assistant.io/t/packages-postnl-dhl-nl-dpd-and-gls-parcel-integration/112433/).
 
 A custom Home Assistant integration that tracks your GLS parcels in Austria, Belgium, Canada, Croatia, the Czech Republic, Denmark, Finland, France, Germany, Hungary, Ireland, Italy, Liechtenstein, Luxembourg, the Netherlands, Poland, Portugal, Romania, Serbia, Slovakia, Slovenia, Spain, Sweden, Switzerland and the United States. Manual tracking needs no GLS account: enter a tracking number and delivery postal code. Danish and Polish GLS accounts can also discover incoming packages automatically.
 
@@ -52,22 +52,22 @@ A custom Home Assistant integration that tracks your GLS parcels in Austria, Bel
   **Spain**, **Sweden**, **Switzerland** and **the United States** are
   available today;
   the setup form links to the
-  [organisation discussion](https://github.com/ha-parcel-integrations/.github/discussions/new/choose)
+  [feature request](https://github.com/Daniel-Dietz/ha-gls/issues/new/choose)
   for requesting another country
 
 ## Installation
 
-### Marketplace (recommended)
+### HACS custom repository
 
-1. Open the Marketplace and search for **GLS**
-2. Install it
-3. Restart Home Assistant if it asks you to
+This fork is not listed as a default HACS repository and has no validated release yet. Do not install it from HACS until an independently validated release has been published.
 
-Or click the button below to open it directly in the Marketplace:
+After the first release, add the repository **Daniel-Dietz/ha-gls** in HACS as a custom repository (category: Integration), install GLS and restart Home Assistant. The button below selects this repository, not the upstream integration.
 
-[![Open your Home Assistant instance and open a repository inside the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=ha-parcel-integrations&repository=ha-gls&category=integration)
+[![Open your Home Assistant instance and open a repository inside the Marketplace.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=Daniel-Dietz&repository=ha-gls&category=integration)
 
-### Manual
+### Manual (development/testing only)
+
+Use a reviewed revision in a disposable test instance; do not treat this procedure as production approval.
 
 1. Copy the `gls` folder into your `config/custom_components/` directory
 2. Restart Home Assistant
@@ -330,7 +330,7 @@ button), and check **Settings → System → Logs**.
 
 ## Related integrations
 
-This integration is part of [**ha-parcel-integrations**](https://ha-parcel-integrations.github.io/) — a family of
+This integration is derived from [**ha-parcel-integrations**](https://ha-parcel-integrations.github.io/) — a family of
 parcel-carrier integrations that all publish the same canonical parcel format,
 statuses and events.
 
@@ -354,3 +354,7 @@ submitting a large change.
 ## License
 
 MIT
+
+## Development and quality
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), the [Home Assistant engineering standard](docs/HA_ENGINEERING_STANDARD.md), [CHANGELOG.md](CHANGELOG.md) and the [audit register](docs/AUDIT_REGISTER.md). The standard is a project policy, not a Home Assistant Core certification.

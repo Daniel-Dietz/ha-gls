@@ -40,8 +40,7 @@ _LOGGER = logging.getLogger(__name__)
 _BERLIN = ZoneInfo("Europe/Berlin")
 
 _NEW_ISSUE_URL = (
-    "https://github.com/ha-parcel-integrations/ha-gls/issues/new"
-    "?template=unrecognised_status.yml"
+    "https://github.com/Daniel-Dietz/ha-gls/issues/new?template=unrecognised_status.yml"
 )
 
 # Pin one locale for the (never-used-for-logic) event text:

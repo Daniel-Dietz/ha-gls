@@ -142,6 +142,7 @@ class GlsCoordinator(GlsBaseCoordinator):
             )
 
     async def _async_poll(self) -> list[dict]:
+        """Fetch tracked parcels, preserve cached data and publish the new snapshot."""
         tracked = self._tracked()
         country = self.config_entry.options.get(CONF_COUNTRY, DEFAULT_COUNTRY)
         postal_code = self.config_entry.options.get(CONF_POSTAL_CODE)

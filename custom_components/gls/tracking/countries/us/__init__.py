@@ -55,8 +55,7 @@ _unexpected_shapes_logged: set[str] = set()
 _unparseable_timestamps_logged: set[str] = set()
 
 _NEW_ISSUE_URL = (
-    "https://github.com/ha-parcel-integrations/ha-gls/issues/new"
-    "?template=unrecognised_status.yml"
+    "https://github.com/Daniel-Dietz/ha-gls/issues/new?template=unrecognised_status.yml"
 )
 
 # The .NET sentinels the backend sends for "no such date". They parse fine, so
@@ -72,6 +71,7 @@ _NO_TIMESTAMP = datetime.min.replace(tzinfo=UTC)
 
 
 def _normalise_status(value: object) -> str | None:
+    """Normalize a US status label for comparison."""
     if not isinstance(value, str):
         return None
     # The backend pads composed scan texts with runs of spaces
@@ -94,6 +94,7 @@ def _lookup_status(normalised: str) -> ParcelStatus | None:
 
 
 def _warn_unmapped_status(value: object) -> None:
+    """Log an unmapped US status once per distinct value."""
     text = str(value)
     if text in _unmapped_statuses_logged:
         return
@@ -140,6 +141,7 @@ def map_event_status_us(value: object) -> ParcelStatus | None:
 
 
 def _warn_shape(path: str, value: object) -> None:
+    """Log the unexpected type of a US response field once."""
     marker = f"{path}: {type(value).__name__}"
     if marker in _unexpected_shapes_logged:
         return
@@ -175,6 +177,7 @@ def _parse_timestamp(value: object) -> str | None:
 
 
 def _transit_details(shipment: dict) -> list[dict]:
+    """Return the usable transit detail records from a US shipment."""
     details = shipment.get("transitDetails")
     if details is None:
         return []
@@ -185,6 +188,7 @@ def _transit_details(shipment: dict) -> list[dict]:
 
 
 def _event_datetimes(shipment: dict) -> list[datetime]:
+    """Collect parseable timestamps from the shipment's transit records."""
     return [
         parsed
         for detail in _transit_details(shipment)
@@ -291,6 +295,7 @@ def _derive_status(shipment: dict) -> ParcelStatus:
 
 
 def _history(shipment: dict) -> list[dict]:
+    """Convert US transit records into canonical tracking history."""
     events: list[tuple[datetime, dict]] = []
     for detail in _transit_details(shipment):
         parsed = _parse_datetime(detail.get("eventDateTime"))

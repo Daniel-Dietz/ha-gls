@@ -2,8 +2,6 @@ name: 🏷️ Unrecognised parcel status
 description: The integration logged a warning about a GLS state it does not know yet.
 title: "[status] "
 labels: ["unrecognised-status"]
-assignees:
-  - peter-mdf
 body:
   - type: markdown
     attributes:

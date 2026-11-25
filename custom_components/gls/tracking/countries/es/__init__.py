@@ -57,8 +57,7 @@ from .signing import request_timestamp, sign_request
 _LOGGER = logging.getLogger(__name__)
 
 _NEW_ISSUE_URL = (
-    "https://github.com/ha-parcel-integrations/ha-gls/issues/new"
-    "?template=unrecognised_status.yml"
+    "https://github.com/Daniel-Dietz/ha-gls/issues/new?template=unrecognised_status.yml"
 )
 
 # ``state.code`` and ``tracking[].code`` draw on one vocabulary, so one map

@@ -113,6 +113,7 @@ def async_setup_services(hass: HomeAssistant, *, hub: bool = True) -> None:
     """
 
     async def _track(call: ServiceCall) -> None:
+        """Validate and add a tracking code to the selected hub."""
         parcel_no = normalize_parcel_no(call.data[CONF_TRACKING_CODE])
         if not valid_parcel_no(parcel_no):
             raise ServiceValidationError(f"'{parcel_no}' is not a valid parcel number")
@@ -144,6 +145,7 @@ def async_setup_services(hass: HomeAssistant, *, hub: bool = True) -> None:
         )
 
     async def _untrack(call: ServiceCall) -> None:
+        """Remove the tracking code and its annotation from matching hubs."""
         parcel_no = normalize_parcel_no(call.data[CONF_TRACKING_CODE])
         entries = [
             entry
@@ -164,6 +166,7 @@ def async_setup_services(hass: HomeAssistant, *, hub: bool = True) -> None:
                 )
 
     async def _update_contents(call: ServiceCall) -> None:
+        """Resolve the target entries and update their stored parcel annotations."""
         code = normalize_code(call.data[CONF_TRACKING_CODE])
         if not code:
             raise ServiceValidationError("A tracking code is required")

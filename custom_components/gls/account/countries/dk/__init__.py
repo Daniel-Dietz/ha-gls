@@ -17,8 +17,7 @@ from ...normalize import pick, text as _text
 
 _LOGGER = logging.getLogger(__name__)
 _NEW_ISSUE_URL = (
-    "https://github.com/ha-parcel-integrations/ha-gls/issues/new"
-    "?template=unrecognised_status.yml"
+    "https://github.com/Daniel-Dietz/ha-gls/issues/new?template=unrecognised_status.yml"
 )
 _unmapped_states_logged: set[tuple[int | None, int | None]] = set()
 _STATUS_MAP = {

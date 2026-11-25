@@ -99,8 +99,7 @@ _STATE_MAP: dict[int, ParcelStatus] = {
 # user following this link from their log lands somewhere that already
 # asks the right questions.
 _NEW_ISSUE_URL = (
-    "https://github.com/ha-parcel-integrations/ha-gls/issues/new"
-    "?template=unrecognised_status.yml"
+    "https://github.com/Daniel-Dietz/ha-gls/issues/new?template=unrecognised_status.yml"
 )
 
 # States we have already warned about, so each unmapped one is logged only

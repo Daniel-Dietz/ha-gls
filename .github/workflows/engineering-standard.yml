@@ -1,0 +1,34 @@
+name: Engineering standard
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags: ['*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  policy:
+    name: Engineering policy
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check out complete history for immutable test-debt baseline
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: "3.13"
+      - name: Test the policy checker
+        run: python -m unittest discover -s scripts -p 'test_*.py'
+      - name: Enforce integration policy
+        run: python scripts/check_integration.py
+      - name: Validate versioned tag metadata
+        if: github.ref_type == 'tag'
+        run: python scripts/check_integration.py --release-tag "$GITHUB_REF_NAME"

@@ -78,6 +78,7 @@ class GlsDeliveriesCalendar(CoordinatorEntity[GlsBaseCoordinator], CalendarEntit
         self._attr_device_info = build_device_info(entry)
 
     def _events(self) -> list[CalendarEvent]:
+        """Build read-only calendar events from active parcels with delivery estimates."""
         events: list[CalendarEvent] = []
         for parcel in self.coordinator.data or []:
             start = _parse(parcel.get("planned_from"))
