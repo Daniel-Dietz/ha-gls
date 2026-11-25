@@ -137,6 +137,10 @@ services apply only to manual hubs; they never edit the GLS account's list.
 
 ### Adding parcels
 
+For Germany, the optional [local IMAP blueprint](examples/automations/gls_de_mail_tracking.md)
+can automatically register recognized GLS notification e-mails with a tracking-code
+hub. This is not GLS consumer-account login.
+
 A **GLS** hub holds your tracked parcels. Add them any of three ways — new
 per-parcel sensors appear immediately, no restart or manual refresh needed:
 

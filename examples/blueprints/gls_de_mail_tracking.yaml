@@ -1,0 +1,85 @@
+blueprint:
+  name: GLS Germany - Track parcels from e-mail
+  description: >-
+    Register tracking numbers from a dedicated IMAP folder using the existing
+    German GLS tracking hub. Only explicitly allowed senders and new messages
+    are processed. No AI, external mail service or GLS account login is used.
+  domain: automation
+  homeassistant:
+    min_version: "2026.1.0"
+  input:
+    mailbox:
+      name: IMAP username
+      description: Exact username of the configured Home Assistant IMAP entry.
+      selector:
+        text:
+    folder:
+      name: IMAP folder
+      description: Dedicated GLS shipping notification folder (exact IMAP name).
+      selector:
+        text:
+    senders:
+      name: Allowed senders
+      description: >-
+        Exact sender values from trusted GLS notifications, one per line.
+        Do not enter domains, wildcards or general shipping senders.
+      selector:
+        text:
+          multiline: true
+    postal_code:
+      name: German delivery postcode
+      description: Five-digit postcode of the already configured GLS Germany tracking hub.
+      selector:
+        text:
+
+mode: queued
+max: 20
+trace:
+  stored_traces: 0
+
+triggers:
+  - trigger: event
+    event_type: imap_content
+    event_data:
+      username: !input mailbox
+      folder: !input folder
+      initial: true
+
+variables:
+  allowed_senders: !input senders
+  postal_code: !input postal_code
+
+conditions:
+  - condition: template
+    value_template: >-
+      {{ (trigger.event.data.sender | default('', true) | trim | lower)
+         in (allowed_senders.splitlines() | map('trim') | map('lower')
+             | reject('eq', '') | list)
+         and postal_code is string
+         and postal_code | length == 5
+         and postal_code | regex_match('^[0-9]{5}$') }}
+
+actions:
+  - variables:
+      tracking_codes: >-
+        {% set content = (trigger.event.data.subject | default('', true))
+           ~ '\n' ~ (trigger.event.data.text | default('', true)) %}
+        {% set labeled = content | regex_findall('(?aim)^[ \t]*(?:GLS[ \t]+)?(?:Paketnummer|Sendungsnummer|Track[- ]?ID|Trackingnummer|Parcel number|Tracking ID)[ \t]*:[ \t]*([0-9]{11,12}|[A-Z0-9]{8})(?![A-Z0-9_%.-])') %}
+        {% set links = content | regex_findall('(?ai)(?<![A-Z0-9@._-])https://(?:(?:www[.])?gls-pakete[.]de/(?:reach-sendungsverfolgung|sendungsverfolgung|en/parcel-tracking)|gls-group[.]com/GROUP/en/parcel-tracking)[?]match=([0-9]{11,12}|[A-Z0-9]{8})(?![A-Z0-9_%.-])') %}
+        {% set result = namespace(codes=[]) %}
+        {% for raw_code in labeled + links %}
+          {% set code = raw_code | upper %}
+          {% if (code | length > 8 or
+                (code | regex_search('[A-Z]') and code | regex_search('[0-9]')))
+                and code not in result.codes %}
+            {% set result.codes = result.codes + [code] %}
+          {% endif %}
+        {% endfor %}
+        {{ result.codes }}
+  - repeat:
+      for_each: "{{ tracking_codes }}"
+      sequence:
+        - action: gls.track_parcel
+          data:
+            tracking_code: "{{ repeat.item }}"
+            postal_code: !input postal_code
