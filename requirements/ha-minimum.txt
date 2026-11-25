@@ -3,3 +3,7 @@ pytest-homeassistant-custom-component==0.13.298
 pytest==9.0.0
 pytest-asyncio==1.3.0
 pytest-cov==7.0.0
+# HA 2025.12.0 pins aiodns 3.5.0, which uses the pycares 4.x API.
+# pycares 5.2.1 satisfies its declared lower bound but breaks imports.
+# Keep this test-only constraint until #34 validates an updated harness.
+pycares==4.11.0
