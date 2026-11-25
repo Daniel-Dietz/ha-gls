@@ -25,6 +25,7 @@ from custom_components.gls.const import (
 
 
 def raw_parcel(number="EXAMPLE123456", *, delivered=False):
+    """Build a synthetic Danish parcel with a sensitive field and one status event."""
     return {
         "parcelNumber": number,
         "userId": "example-firebase-user",
@@ -44,6 +45,7 @@ def raw_parcel(number="EXAMPLE123456", *, delivered=False):
 
 
 def account(hass):
+    """Create a registered Danish entry with an isolated mocked account session."""
     entry = MockConfigEntry(
         domain=DOMAIN,
         unique_id="account:example-firebase-user",
@@ -62,6 +64,7 @@ def account(hass):
 
 
 async def test_empty_account_keeps_polling_and_discovers_new_parcel(hass):
+    """Keep discovery polling active on an empty account and sanitize a later parcel."""
     coordinator, session = account(hass)
     session.async_get_parcels.return_value = {"totalCount": 0, "items": []}
     with patch(
@@ -82,6 +85,7 @@ async def test_empty_account_keeps_polling_and_discovers_new_parcel(hass):
 
 
 async def test_delivered_account_keeps_discovery_and_removed_parcel_disappears(hass):
+    """Continue discovery after delivery and remove parcels absent from the next feed."""
     coordinator, session = account(hass)
     session.async_get_parcels.return_value = {
         "totalCount": 1,
@@ -97,6 +101,7 @@ async def test_delivered_account_keeps_discovery_and_removed_parcel_disappears(h
 
 
 async def test_account_counting_a_parcel_it_does_not_send_still_loads(hass):
+    """Accept the Danish feed's count ceiling even when no items are returned."""
     coordinator, session = account(hass)
     session.async_get_parcels.return_value = {"totalCount": 1, "items": []}
     assert await coordinator._async_update_data() == []
@@ -131,6 +136,7 @@ async def test_account_counting_a_parcel_it_does_not_send_still_loads(hass):
     ],
 )
 async def test_invalid_or_incomplete_feed_never_replaces_snapshot(hass, feed):
+    """Reject invalid snapshots without changing previously published delivery state."""
     coordinator, session = account(hass)
     coordinator.delivered = [{"barcode": "retained"}]
     coordinator._known_state = {"retained": ParcelStatus.DELIVERED}
@@ -144,6 +150,7 @@ async def test_invalid_or_incomplete_feed_never_replaces_snapshot(hass, feed):
 
 
 async def test_transport_error_preserves_last_success_and_data(hass):
+    """Preserve the last successful snapshot and timestamp on a transport failure."""
     coordinator, session = account(hass)
     session.async_get_parcels.return_value = {"totalCount": 1, "items": [raw_parcel()]}
     await coordinator.async_refresh()
@@ -157,6 +164,7 @@ async def test_transport_error_preserves_last_success_and_data(hass):
 
 
 async def test_auth_failure_becomes_ha_reauth(hass):
+    """Translate an account authentication failure into Home Assistant reauth."""
     coordinator, session = account(hass)
     session.async_get_parcels.side_effect = GlsDkAuthError("sign-in required")
     with pytest.raises(ConfigEntryAuthFailed):
@@ -165,6 +173,7 @@ async def test_auth_failure_becomes_ha_reauth(hass):
 
 @pytest.mark.parametrize("status", [401, 403])
 async def test_backend_rejection_is_retried_not_reauthenticated(hass, status):
+    """Report ordinary backend rejection as a retryable update failure, not reauth."""
     coordinator, session = account(hass)
     session.async_get_parcels.side_effect = GlsDkApiError(
         "rejected", status_code=status
@@ -199,6 +208,7 @@ async def test_failure_names_the_step_and_status(hass, error, message):
 
 
 async def test_account_feed_is_read_whole_so_nothing_is_skipped_from_the_fetch(hass):
+    """Retain delivered parcels in account discovery rather than skipping their IDs."""
     coordinator, session = account(hass)
     session.async_get_parcels.return_value = {
         "totalCount": 1,
@@ -211,6 +221,7 @@ async def test_account_feed_is_read_whole_so_nothing_is_skipped_from_the_fetch(h
 
 @pytest.mark.parametrize(("retry_after", "expected"), [(120, 120), (None, 3600)])
 async def test_rate_limit_uses_homeassistant_retry_after(hass, retry_after, expected):
+    """Propagate a carrier rate-limit delay to Home Assistant's update scheduler."""
     coordinator, session = account(hass)
     session.async_get_parcels.side_effect = GlsDkApiError(
         "rate limited", status_code=429, retry_after=retry_after
