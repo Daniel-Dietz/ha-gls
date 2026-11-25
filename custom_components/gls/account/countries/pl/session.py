@@ -118,6 +118,7 @@ async def _guarded(failure: str) -> AsyncIterator[None]:
 
 
 def _b64url(raw: bytes) -> str:
+    """Encode bytes as unpadded URL-safe base64 for PKCE."""
     return base64.urlsafe_b64encode(raw).rstrip(b"=").decode()
 
 
@@ -443,6 +444,7 @@ class GlsPlSession:
 
     @staticmethod
     def _collect_cookies(response: aiohttp.ClientResponse, jar: dict[str, str]) -> None:
+        """Collect the B2C response cookies for the next isolated sign-in step."""
         for hop in (*response.history, response):
             for header in hop.headers.getall("Set-Cookie", []):
                 name, _, value = header.split(";", 1)[0].partition("=")

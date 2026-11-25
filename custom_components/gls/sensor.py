@@ -146,6 +146,7 @@ class GlsIncomingParcelsSensor(CoordinatorEntity[GlsBaseCoordinator], SensorEnti
         return {"parcels": self.coordinator.data or []}
 
     def _handle_coordinator_update(self) -> None:
+        """Reconcile per-parcel sensors with the latest active barcode set."""
         current_barcodes: set[str] = {
             p.get("barcode", "") for p in (self.coordinator.data or [])
         }
@@ -191,6 +192,7 @@ class GlsParcelSensor(CoordinatorEntity[GlsBaseCoordinator], SensorEntity):
         self._attr_device_info = build_device_info(entry)
 
     def _get_parcel(self) -> dict[str, Any] | None:
+        """Find the current parcel by this sensor's barcode."""
         for parcel in self.coordinator.data or []:
             if parcel.get("barcode") == self._barcode:
                 return parcel
@@ -224,6 +226,7 @@ class GlsNextDeliverySensor(CoordinatorEntity[GlsBaseCoordinator], SensorEntity)
         self._attr_device_info = build_device_info(entry)
 
     def _delivery_moments(self) -> list[tuple[datetime, dict]]:
+        """Collect unexpired delivery windows for the next-delivery sensor."""
         result: list[tuple[datetime, dict]] = []
         now = dt_util.utcnow()
         for parcel in self.coordinator.data or []:
@@ -284,6 +287,7 @@ class GlsEnRouteToPickupPointSensor(
         self._attr_device_info = build_device_info(entry)
 
     def _parcels(self) -> list[dict]:
+        """Select parcels still travelling to a pickup point."""
         return [
             p
             for p in (self.coordinator.data or [])
@@ -319,6 +323,7 @@ class GlsAwaitingPickupSensor(CoordinatorEntity[GlsBaseCoordinator], SensorEntit
         self._attr_device_info = build_device_info(entry)
 
     def _parcels(self) -> list[dict]:
+        """Select parcels ready for collection at a pickup point."""
         return [
             p
             for p in (self.coordinator.data or [])

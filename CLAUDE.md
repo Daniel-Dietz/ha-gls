@@ -1,3 +1,5 @@
+> Mandatory project policy: [AGENTS.md](AGENTS.md) and [the engineering standard](docs/HA_ENGINEERING_STANDARD.md) apply to all changes and take precedence over older repository-specific workflow guidance. Consult [the audit register](docs/AUDIT_REGISTER.md).
+
 # Working in this repository
 
 Home Assistant custom integration for **GLS** parcel tracking (25 countries).

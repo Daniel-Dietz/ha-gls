@@ -191,6 +191,7 @@ def _parse_datetime(value: object) -> datetime | None:
 
 
 def _events(raw: dict) -> list[dict]:
+    """Return the Polish shipment's event records when the field is a list."""
     events = raw.get("eventReasons")
     if not isinstance(events, list):
         return []

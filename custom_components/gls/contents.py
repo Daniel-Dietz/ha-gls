@@ -87,6 +87,7 @@ class ContentsStore:
 
     @callback
     def _data_to_save(self) -> dict[str, dict[str, str]]:
+        """Return a snapshot of the annotations for the delayed storage write."""
         return {"by_code": dict(self._by_code)}
 
     async def async_remove(self) -> None:

@@ -161,6 +161,7 @@ async def _async_setup_account(hass: HomeAssistant, entry: GlsConfigEntry) -> bo
         # A restored session never knows its sign-in identifier (it is learned
         # at sign-in only); ``persisted_state`` drops that empty value, so the
         # stored one is kept.
+        """Persist rotated account credentials without overwriting the stored login."""
         data = {**entry.data, **country.persisted_state(state)}
         if data != entry.data:
             hass.config_entries.async_update_entry(entry, data=data)

@@ -354,3 +354,7 @@ submitting a large change.
 ## License
 
 MIT
+
+## Development and quality
+
+See [CONTRIBUTING.md](CONTRIBUTING.md), the [Home Assistant engineering standard](docs/HA_ENGINEERING_STANDARD.md), [CHANGELOG.md](CHANGELOG.md) and the [audit register](docs/AUDIT_REGISTER.md). The standard is a project policy, not a Home Assistant Core certification.

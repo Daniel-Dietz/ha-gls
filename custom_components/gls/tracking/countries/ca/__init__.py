@@ -46,12 +46,14 @@ _NEW_ISSUE_URL = (
 
 
 def _normalise_status(value: object) -> str | None:
+    """Normalize a Canadian status label for comparison."""
     return (
         value.strip().casefold() if isinstance(value, str) and value.strip() else None
     )
 
 
 def _warn_unmapped_status(value: object) -> None:
+    """Log an unmapped Canadian status once per distinct value."""
     text = str(value)
     if text in _unmapped_statuses_logged:
         return
@@ -89,6 +91,7 @@ def map_event_status_ca(value: object) -> ParcelStatus | None:
 
 
 def _warn_shape(path: str, value: object) -> None:
+    """Log the unexpected type of a Canadian response field once."""
     marker = f"{path}: {type(value).__name__}"
     if marker in _unexpected_shapes_logged:
         return
@@ -116,6 +119,7 @@ def _parse_timestamp(value: object) -> str | None:
 
 
 def _shipment_for_code(raw: dict, parcel_no: str | None) -> dict | None:
+    """Find the shipment whose tracking number matches the requested code."""
     shipments = raw.get("shipments")
     if not isinstance(shipments, list):
         _warn_shape("shipments", shipments)
@@ -155,6 +159,7 @@ def _usable_body(body: dict | None, parcel_no: str) -> dict[str, Any] | None:
 async def _async_get_json(
     session: aiohttp.ClientSession, url: str
 ) -> tuple[int, dict | None]:
+    """Read the response status and JSON object from a Canadian endpoint."""
     async with session.get(url, headers={"Accept-Language": "en-CA"}) as response:
         status = response.status
         if status != 200:
@@ -197,6 +202,7 @@ async def async_get_parcel_ca(
 
 
 def _dimensions(shipment: dict) -> dict | None:
+    """Extract the available shipment dimensions from the Canadian parcel list."""
     parcels = shipment.get("parcels")
     if not isinstance(parcels, list) or not parcels:
         return None
@@ -232,6 +238,7 @@ def _party_label(value: object) -> str | None:
 
 
 def _history(shipment: dict) -> list[dict]:
+    """Convert Canadian activity records into canonical tracking history."""
     events: list[tuple[datetime, dict]] = []
     for parcel in shipment.get("parcels") or []:
         if not isinstance(parcel, dict):

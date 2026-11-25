@@ -1,43 +1,40 @@
-name: Release
+name: Release candidate validation
 
-# The workflow_run branch filter alone is not a trust boundary: a fork pull
-# request from a branch named main also reports main here. Requiring the
-# triggering event to be a push is what keeps forks away from the release
-# token, so never drop that condition.
-
+# Publication is intentionally disabled until #3, #32 and #33 are resolved.
+# Do not restore a mutable upstream workflow or add write permissions here.
 on:
-  workflow_run:
-    workflows: [Validate]
-    types: [completed]
-    branches: [main]
   workflow_dispatch:
     inputs:
-      dry_run:
-        description: Only calculate the next release; do not create or update a PR.
+      version:
+        description: Exact proposed manifest version and changelog heading
         required: true
-        default: true
-        type: boolean
+        type: string
+      previous_version:
+        description: Previous release version (or inherited version for the first release)
+        required: true
+        type: string
 
 permissions:
-  contents: write
-  issues: read
-  pull-requests: write
-  id-token: write
-
-concurrency:
-  group: release-main
-  cancel-in-progress: false
+  contents: read
 
 jobs:
-  release:
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event.workflow_run.conclusion == 'success' &&
-       github.event.workflow_run.event == 'push')
-    uses: ha-parcel-integrations/.github/.github/workflows/carrier-release.yml@main
-    with:
-      domain: gls
-      head-sha: ${{ github.event.workflow_run.head_sha || github.sha }}
-      dry-run: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
-    secrets:
-      release-bot-token: ${{ secrets.RELEASE_BOT_TOKEN }}
+  candidate:
+    name: Read-only release candidate check
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: "3.13"
+      - name: Validate candidate without creating tags, PRs or releases
+        env:
+          CANDIDATE_VERSION: ${{ inputs.version }}
+          PREVIOUS_VERSION: ${{ inputs.previous_version }}
+        run: |
+          python scripts/check_integration.py --release-tag "$CANDIDATE_VERSION" --previous-version "$PREVIOUS_VERSION"
+          python -m unittest discover -s scripts -p 'test_*.py'
