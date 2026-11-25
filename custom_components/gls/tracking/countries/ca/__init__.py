@@ -40,8 +40,7 @@ _unexpected_shapes_logged: set[str] = set()
 _unparseable_timestamps_logged: set[str] = set()
 
 _NEW_ISSUE_URL = (
-    "https://github.com/ha-parcel-integrations/ha-gls/issues/new"
-    "?template=unrecognised_status.yml"
+    "https://github.com/Daniel-Dietz/ha-gls/issues/new?template=unrecognised_status.yml"
 )
 
 

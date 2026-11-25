@@ -3,6 +3,7 @@
 ## [Unreleased]
 
 ### Changed
+- Correct repository-specific support, ownership and HACS onboarding metadata; preserve upstream credit. Declare the integration as custom instead of claiming a verified Silver tier.
 - Establish a portable Home Assistant engineering standard, version policy, audit register and automated documentation/metadata checks.
 - Replace unsafe automatic publishing with a read-only release-candidate validation workflow pending the release hardening issues.
 - Document previously undocumented production Python functions and methods without changing runtime behavior.

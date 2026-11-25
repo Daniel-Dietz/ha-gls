@@ -32,7 +32,7 @@ Standard revision: 1.0.0. Applies to every new or changed custom integration own
 
 - Maintain README (installation, config, examples, compatibility, capabilities, limitations, troubleshooting), architecture/data contracts, changelog, contribution instructions, security/privacy guidance and source/license attribution. Update docs alongside behavior and translations; clearly distinguish planned from implemented behavior.
 - Add regression tests for each finding. Use mocked API calls with synthetic data; test setup, reauth, unload, restart, migration, failures, retries, malformed data, race conditions, permissions, privacy, multi-entry isolation and entity/event contract. Test public behavior, not merely implementation internals. Live tests use only an authorized test account and safe operations.
-- Target at least 95% line coverage across integration code; require tests on new/changed behavior, Ruff format/lint, type checking, hassfest, HACS validation, translation/metadata/docstring policy checks and applicable security scans. Coverage is not proof of correctness. Test minimum/current supported HA and record exact versions and commit.
+- Target at least 95% line coverage across integration code; require tests on new/changed behavior, Ruff format/lint, type checking, hassfest, HACS validation, translation/metadata/docstring policy checks and applicable security scans. Coverage is not proof of correctness. Test minimum/current supported HA and record exact versions and commit. Pin the test harness to a matching Core version. The newest published harness on 2026-11-25 targets HA 2026.10.4, while Core 2026.11.3 is available; validation of the latter remains outstanding under #34. Never claim the untested version is covered.
 - The temporary baseline for undocumented existing test definitions is pinned to the initial audited commit; unchanged legacy definitions alone are grandfathered under #39. New or changed undocumented test definitions fail the policy check. Production and engineering tooling have no such exceptions. Remove the baseline when #39 is resolved.
 
 ## 5. Home Assistant quality checklist
@@ -42,7 +42,7 @@ For every integration, evaluate the official quality-scale rules individually. R
 - Silver: availability and error handling, reauth, integration ownership, strong test coverage and reliability documentation.
 - Gold: diagnostics, localization, repair/reconfigure/discovery when applicable, device/entity modeling, end-user docs and supported features.
 - Platinum: strict typing, async dependencies and shared sessions.
-- Use the current official exhaustive rule list for the actual assessment. Existing GLS silver claim is pending verification (#40); do not claim compliance based on this checklist alone.
+- Use the current official exhaustive rule list for the actual assessment. The GLS manifest identifies this as a custom integration, not an officially graded Core integration. Track the [internal evidence register](HA_QUALITY_ASSESSMENT.md) against every applicable rule under #40; do not claim compliance based on this checklist alone.
 
 ## 6. Definition of done and issue traceability
 

@@ -2,8 +2,7 @@ name: Validate
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
   pull_request:
   schedule:
     - cron: "0 0 * * *"
@@ -13,7 +12,122 @@ permissions:
   contents: read
 
 jobs:
-  validate:
-    uses: ha-parcel-integrations/.github/.github/workflows/carrier-validate.yml@main
-    with:
-      domain: gls
+  hacs:
+    name: HACS validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: hacs/action@1ebf01c408f29afcb6406bd431bc98fd8cbb15aa # reviewed ref
+        with:
+          category: integration
+
+  hassfest:
+    name: Hassfest validation
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: home-assistant/actions/hassfest@9e9565e68f5a70d874202871f4c4064d23814235 # reviewed ref
+
+  tests:
+    name: HA tests (${{ matrix.ha }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - ha: "2025.12.0"
+            python: "3.13"
+            requirements: requirements/ha-minimum.txt
+          - ha: "2026.2.3"
+            python: "3.13"
+            requirements: requirements-dev.txt
+          - ha: "2026.10.4"
+            python: "3.14"
+            requirements: requirements/ha-current.txt
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Install pinned test harness
+        env:
+          REQUIREMENTS: ${{ matrix.requirements }}
+        run: python -m pip install -r "$REQUIREMENTS"
+      - name: Check dependency consistency and exact HA version
+        env:
+          EXPECTED_HA: ${{ matrix.ha }}
+        run: |
+          python -m pip check
+          python -c 'import importlib.metadata as m, os; assert m.version("homeassistant") == os.environ["EXPECTED_HA"]'
+          python -m pip freeze
+      - name: Run full tests and enforce coverage
+        run: python -m pytest tests/ --cov=custom_components.gls --cov-fail-under=95 -q
+
+  lint:
+    name: Ruff lint and format
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/ruff-action@278981a28ce3188b1e39527901f38254bf3aac89 # v4.1.0
+        with:
+          version: "0.17.0"
+          args: check
+      - uses: astral-sh/ruff-action@278981a28ce3188b1e39527901f38254bf3aac89 # v4.1.0
+        with:
+          version: "0.17.0"
+          args: format --check
+
+  types:
+    name: Mypy
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0 # v7
+        with:
+          python-version: "3.13"
+      - run: python -m pip install -r requirements-dev.txt mypy==2.4.0
+      - run: mypy custom_components/gls --ignore-missing-imports
+
+  suite:
+    name: Parcel suite compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      DOMAIN: gls
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          repository: ha-parcel-integrations/.github
+          ref: 138fc323d767008e3bfe328809803265cad6e00a
+          path: .suite
+          persist-credentials: false
+      - run: python .suite/.github/scripts/check_policy.py
+      - run: python .suite/.github/scripts/check_code_rules.py
+      - run: python .suite/.github/scripts/check_translations.py custom_components/gls/translations
+      - run: python -m pip install Pillow==12.0.0
+      - run: python .suite/.github/scripts/check_brand_icon.py
+      - name: Validate commit messages
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: python .suite/.github/scripts/check_commit_messages.py "$BASE_SHA..$HEAD_SHA"

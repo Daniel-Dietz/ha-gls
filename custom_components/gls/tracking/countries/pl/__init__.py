@@ -45,8 +45,7 @@ from ....delivery_window import is_pickup
 _LOGGER = logging.getLogger(__name__)
 
 _NEW_ISSUE_URL = (
-    "https://github.com/ha-parcel-integrations/ha-gls/issues/new"
-    "?template=unrecognised_status.yml"
+    "https://github.com/Daniel-Dietz/ha-gls/issues/new?template=unrecognised_status.yml"
 )
 
 # ``progressBarIdent`` — the pan-EU group vocabulary. Only ``DELIVERED`` has

@@ -2,13 +2,13 @@
   "domain": "gls",
   "name": "GLS",
   "categories": ["productivity_information"],
-  "codeowners": ["@peter-mdf"],
+  "codeowners": ["@Daniel-Dietz"],
   "config_flow": true,
-  "documentation": "https://github.com/ha-parcel-integrations/ha-gls",
+  "documentation": "https://github.com/Daniel-Dietz/ha-gls",
   "integration_type": "hub",
   "iot_class": "cloud_polling",
-  "issue_tracker": "https://github.com/ha-parcel-integrations/ha-gls/issues",
-  "quality_scale": "silver",
+  "issue_tracker": "https://github.com/Daniel-Dietz/ha-gls/issues",
+  "quality_scale": "custom",
   "requirements": [],
   "version": "2.0.1"
 }

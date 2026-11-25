@@ -47,6 +47,7 @@ Each finding has its own GitHub issue containing source references, acceptance c
 | [#39](https://github.com/Daniel-Dietz/ha-gls/issues/39) | [P2][Documentation] Complete existing test-function and helper docstrings |
 | [#40](https://github.com/Daniel-Dietz/ha-gls/issues/40) | [P2][HA quality scale] Substantiate integration quality tier against all applicable rules |
 | [#41](https://github.com/Daniel-Dietz/ha-gls/issues/41) | [P3][Licensing] Verify and preserve correct upstream license and attribution |
+| [#43](https://github.com/Daniel-Dietz/ha-gls/issues/43) | [P2][HACS] Configure repository topics required by HACS validation |
 
 The feature request #23 is not an audit defect. #38 is the engineering standard; #39–#41 record additional findings.
 

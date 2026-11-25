@@ -11,6 +11,6 @@ Run the following from a complete Git checkout using a Python version supported 
     ruff format --check .
     mypy custom_components/gls --ignore-missing-imports
 
-Run hassfest, HACS and the security checks in CI. See #34 for reproducible test dependency/minimum-version coverage work and #35 for additional security automation. Record exact dependency versions and checks actually run.
+The pinned test environments are requirements/ha-minimum.txt (Python 3.13, HA 2025.12.0), requirements-dev.txt (Python 3.13, HA 2026.2.3), and requirements/ha-current.txt (Python 3.14, HA 2026.10.4). Install the matching file in an isolated environment. The latter is the latest available compatible test harness, not necessarily the latest Core release. Run hassfest, HACS and the security checks in CI. See #34 for reproducible test dependency/minimum-version coverage work and #35 for additional security automation. Record exact dependency versions and checks actually run.
 
 Every PR must link its issue(s), explain user impact, add regression tests and relevant docstrings, update documentation/translations/changelog, and record the results. No release without validated version, artifact and compatibility checks. Do not add unrelated changes, secrets or raw production data. Preserve applicable upstream license notices.

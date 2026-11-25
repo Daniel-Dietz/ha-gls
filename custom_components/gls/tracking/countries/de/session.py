@@ -67,8 +67,7 @@ _EXPECTED_TOKEN_LIFETIME = timedelta(hours=60)
 _TOKEN_LIFETIME_TOLERANCE = timedelta(hours=12)
 
 _NEW_ISSUE_URL = (
-    "https://github.com/ha-parcel-integrations/ha-gls/issues/new"
-    "?template=unrecognised_status.yml"
+    "https://github.com/Daniel-Dietz/ha-gls/issues/new?template=unrecognised_status.yml"
 )
 
 # One-shot per HA session, keyed like `parcels.py`'s `_unmapped_states_logged`

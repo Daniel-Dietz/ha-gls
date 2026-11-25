@@ -699,7 +699,7 @@ GROUP_RSTT028_CONFIRMED = frozenset({"CZ", "SE"})
 # suite's standard "how a carrier arrives" channel), never a direct issue —
 # same URL as this repo's own .github/ISSUE_TEMPLATE/config.yml contact link.
 REQUEST_COUNTRY_URL = (
-    "https://github.com/ha-parcel-integrations/.github/discussions/new/choose"
+    "https://github.com/Daniel-Dietz/ha-gls/issues/new?template=feature_request.yml"
 )
 
 # Generic fallback tracking deep-link, used for countries without a specific
